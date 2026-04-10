@@ -1,8 +1,8 @@
 # Obsidian AI Memory Palace
 
-**Give Claude (or any LLM) a persistent memory using your Obsidian vault.**
+**Give Claude a persistent, automatic memory using your Obsidian vault.**
 
-Instead of re-explaining yourself at the start of every session, Claude automatically loads your context from Obsidian — your profile, tech stack, active projects, and working rules. Sessions start smarter, responses are more relevant, and token usage drops by ~80–95%.
+Instead of re-explaining yourself every session, Claude reads your context from Obsidian automatically — your profile, working rules, active projects, and tech stack. Sessions start smarter. Token usage drops by ~80–95%.
 
 ---
 
@@ -12,35 +12,45 @@ Instead of re-explaining yourself at the start of every session, Claude automati
 New Claude session starts
         │
         ▼
-Claude reads your Obsidian notes (via MCP)
+Hook fires → reads vault files from disk (guaranteed, no MCP needed)
+        │
+        ▼
+CLAUDE.md loads Obsidian notes via MCP for deeper context
         │
         ▼
 "Context loaded." — Claude knows who you are
         │
         ▼
-You work... Claude has full context
+Ask domain question → Claude searches vault first (smart search)
         │
         ▼
-Session ends → Claude logs key facts back to Obsidian
+Session ends → Claude logs key facts back to Obsidian automatically
 ```
-
-The magic is two things working together:
-- **Obsidian MCP** — lets Claude read/write your vault in real time
-- **`~/.claude/CLAUDE.md`** — tells Claude to auto-load your memory at every session start
 
 ---
 
-## What Gets Stored
+## Features
+
+| Feature | How |
+|---------|-----|
+| **Auto-load on session start** | `UserPromptSubmit` hook reads vault files from disk |
+| **Deep context on demand** | CLAUDE.md + Obsidian MCP loads full notes selectively |
+| **Smart search** | Searches vault before loading full notes — saves tokens |
+| **Auto session log** | Claude writes decisions back to Obsidian after each session |
+| **Memory compression** | Compresses old session logs monthly to keep notes lean |
+| **Per-project context** | Drop `project-CLAUDE.md` into any repo for project-specific memory |
+
+---
+
+## Memory Files
 
 | Note | Contents |
 |------|----------|
 | `01 Who I Am` | Background, goals, communication style |
 | `02 Work & Tech Stack` | Role, repos, tools, stack |
-| `03 Active Projects` | Current work + session log |
+| `03 Active Projects` | Current work + session log (auto-updated) |
 | `04 AI Working Rules` | How Claude should behave |
 | `05 Interests & Domains` | Knowledge areas, research context |
-
-Each note is short and dense — bullet points, no fluff. Claude loads only what's relevant to the task.
 
 ---
 
@@ -50,13 +60,13 @@ Each note is short and dense — bullet points, no fluff. Claude loads only what
 # 1. Install Obsidian MCP
 claude mcp add obsidian -- npx @modelcontextprotocol/server-obsidian /path/to/vault
 
-# 2. Install memory templates
+# 2. Install memory templates + hook
 chmod +x install.sh
 ./install.sh /path/to/your/obsidian/vault
 
-# 3. Fill in your details in Obsidian (01 and 02 especially)
+# 3. Fill in your details (01 and 02 especially)
 
-# 4. Start a new Claude Code session
+# 4. Start a new Claude Code session — done
 ```
 
 Full instructions: [SETUP.md](SETUP.md)
@@ -69,7 +79,20 @@ Full instructions: [SETUP.md](SETUP.md)
 |----------|-------------------|
 | Re-explaining context manually | 2,000–10,000 |
 | Pasting conversation history | 10,000–50,000+ |
-| **This system (core load)** | **~700** |
+| **This system (hook, core load)** | **~700** |
+| **Smart search (targeted)** | **~200–400** |
+
+---
+
+## Per-Project Memory
+
+Drop `templates/project-CLAUDE.md` into any repo as `CLAUDE.md`:
+
+```bash
+cp templates/project-CLAUDE.md ~/my-project/CLAUDE.md
+```
+
+Claude will load global memory + project-specific context automatically when working in that repo.
 
 ---
 
@@ -81,22 +104,12 @@ Full instructions: [SETUP.md](SETUP.md)
 
 ---
 
-## Customization
-
-The system is fully yours to adapt:
-- Edit any template to match your workflow
-- Add custom rules to `04 AI Working Rules.md`
-- Extend with new notes (just reference them in the Index)
-- Works alongside any existing Obsidian structure
-
----
-
 ## Contributing
 
 PRs welcome. Especially interested in:
 - Templates for specific roles (designer, PM, data scientist)
 - Setup guides for other AI tools (Cursor, Windsurf, etc.)
-- Auto-update scripts / hooks
+- Hooks for other Claude Code events
 
 ---
 

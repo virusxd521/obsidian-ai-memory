@@ -7,6 +7,10 @@ set -e
 
 VAULT_PATH="$1"
 MEMORY_FOLDER="AI Memory"
+CLAUDE_DIR="$HOME/.claude"
+CLAUDE_GLOBAL="$CLAUDE_DIR/CLAUDE.md"
+HOOK_SCRIPT="$CLAUDE_DIR/load-memory.sh"
+SETTINGS="$CLAUDE_DIR/settings.json"
 
 # --- Validate input ---
 if [ -z "$VAULT_PATH" ]; then
@@ -19,35 +23,68 @@ if [ ! -d "$VAULT_PATH" ]; then
   exit 1
 fi
 
-# --- Create folder ---
+mkdir -p "$CLAUDE_DIR"
+
+# --- Copy memory templates to vault ---
 TARGET="$VAULT_PATH/$MEMORY_FOLDER"
 mkdir -p "$TARGET"
-
-# --- Copy templates ---
 cp templates/*.md "$TARGET/"
-echo "Copied templates to: $TARGET"
+echo "✓ Memory notes copied to: $TARGET"
 
-# --- CLAUDE.md ---
-CLAUDE_GLOBAL="$HOME/.claude/CLAUDE.md"
-CLAUDE_TEMPLATE="claude-global.md"
-
+# --- CLAUDE.md (global auto-load instructions) ---
 if [ -f "$CLAUDE_GLOBAL" ]; then
   echo ""
-  echo "WARNING: $CLAUDE_GLOBAL already exists."
-  echo "Manually add the contents of $CLAUDE_TEMPLATE to it."
+  echo "⚠️  $CLAUDE_GLOBAL already exists — skipping."
+  echo "   Manually merge contents of claude-global.md into it."
 else
-  mkdir -p "$HOME/.claude"
-  cp "$CLAUDE_TEMPLATE" "$CLAUDE_GLOBAL"
-  echo "Created: $CLAUDE_GLOBAL"
+  cp claude-global.md "$CLAUDE_GLOBAL"
+  echo "✓ Created: $CLAUDE_GLOBAL"
+fi
+
+# --- Hook script (reads vault files directly for guaranteed auto-load) ---
+ESCAPED_VAULT=$(echo "$TARGET" | sed 's/[\/&]/\\&/g')
+sed "s|VAULT_PATH_PLACEHOLDER|$TARGET|g" hooks/load-memory.sh > "$HOOK_SCRIPT"
+chmod +x "$HOOK_SCRIPT"
+echo "✓ Created hook script: $HOOK_SCRIPT"
+
+# --- Register hook in settings.json ---
+if [ -f "$SETTINGS" ]; then
+  echo ""
+  echo "⚠️  $SETTINGS already exists — hook not auto-added."
+  echo "   Manually add this to your settings.json hooks section:"
+  echo '   "UserPromptSubmit": [{"matcher":"","hooks":[{"type":"command","command":"bash '"$HOOK_SCRIPT"'"}]}]'
+else
+  cat > "$SETTINGS" <<EOF
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOOK_SCRIPT"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+  echo "✓ Created: $SETTINGS (hook registered)"
 fi
 
 # --- Done ---
 echo ""
-echo "Done! Next steps:"
-echo "  1. Open Obsidian → navigate to '$MEMORY_FOLDER' folder"
-echo "  2. Fill in '01 Who I Am.md' with your details"
-echo "  3. Fill in '02 Work & Tech Stack.md' with your stack"
-echo "  4. Update the vault path in $CLAUDE_GLOBAL if needed"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅  Installation complete!"
+echo ""
+echo "Next steps:"
+echo "  1. Open Obsidian → '$MEMORY_FOLDER' folder"
+echo "  2. Fill in '01 Who I Am.md'"
+echo "  3. Fill in '02 Work & Tech Stack.md'"
+echo "  4. (Optional) Drop 'project-CLAUDE.md' template into any repo as CLAUDE.md"
 echo "  5. Start a new Claude Code session — context loads automatically"
 echo ""
 echo "Full guide: SETUP.md"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
