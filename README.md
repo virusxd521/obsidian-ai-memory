@@ -39,6 +39,7 @@ Session ends → Claude logs key facts back to Obsidian automatically
 | **Auto session log** | Claude writes decisions back to Obsidian after each session |
 | **Memory compression** | Compresses old session logs monthly to keep notes lean |
 | **Per-project context** | Drop `project-CLAUDE.md` into any repo for project-specific memory |
+| **Token savings tracking** | Hook logs every session — run `token-stats.sh` to see cumulative savings |
 
 ---
 
@@ -81,6 +82,26 @@ Full instructions: [SETUP.md](SETUP.md)
 | Pasting conversation history | 10,000–50,000+ |
 | **This system (hook, core load)** | **~700** |
 | **Smart search (targeted)** | **~200–400** |
+
+**Track your actual savings:**
+
+```bash
+bash ~/.claude/token-stats.sh
+```
+
+```
+╔══════════════════════════════════════════╗
+║     Obsidian AI Memory — Token Stats     ║
+╠══════════════════════════════════════════╣
+║  Sessions tracked:        42             ║
+║  Tokens injected:       29400            ║
+║  Tokens saved:          96600            ║
+║  Est. cost saved:       $0.2898          ║
+║  Last session:        2026-04-10         ║
+╚══════════════════════════════════════════╝
+```
+
+Every session is logged to `~/.claude/token-log.json` automatically.
 
 ---
 

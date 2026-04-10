@@ -74,6 +74,11 @@ EOF
   echo "✓ Created: $SETTINGS (hook registered)"
 fi
 
+# --- Token stats script ---
+cp token-stats.sh "$CLAUDE_DIR/token-stats.sh"
+chmod +x "$CLAUDE_DIR/token-stats.sh"
+echo "✓ Token stats script: $CLAUDE_DIR/token-stats.sh"
+
 # --- Done ---
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -83,8 +88,11 @@ echo "Next steps:"
 echo "  1. Open Obsidian → '$MEMORY_FOLDER' folder"
 echo "  2. Fill in '01 Who I Am.md'"
 echo "  3. Fill in '02 Work & Tech Stack.md'"
-echo "  4. (Optional) Drop 'project-CLAUDE.md' template into any repo as CLAUDE.md"
+echo "  4. (Optional) Drop 'project-CLAUDE.md' into any repo as CLAUDE.md"
 echo "  5. Start a new Claude Code session — context loads automatically"
+echo ""
+echo "Check token savings anytime:"
+echo "  bash ~/.claude/token-stats.sh"
 echo ""
 echo "Full guide: SETUP.md"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
