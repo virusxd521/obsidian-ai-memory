@@ -15,6 +15,13 @@ At the start of EVERY conversation, automatically do the following:
 
 Do NOT ask the user if they want context loaded. Just do it silently and confirm in one line.
 
+## Skills — Task-Specific Instructions
+
+When the user triggers a skill (e.g. "use code review skill", "use weekly planning skill"):
+- Read the relevant file from `AI Memory/skills/`
+- Apply its instructions for the rest of the session
+- Skills can also load implicitly based on the task type
+
 ## After Productive Sessions
 
 When the session involved decisions, new code, or facts worth remembering:

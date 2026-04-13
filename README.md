@@ -52,6 +52,19 @@ Session ends → Claude logs key facts back to Obsidian automatically
 | `03 Active Projects` | Current work + session log (auto-updated) |
 | `04 AI Working Rules` | How Claude should behave |
 | `05 Interests & Domains` | Knowledge areas, research context |
+| `06 Token Savings Tracker` | Cumulative token savings log |
+
+## Skill Files
+
+Reusable task-specific instructions. Claude loads them on demand — no re-explaining your preferences per task type.
+
+| Skill | Trigger |
+|-------|---------|
+| `skills/CODE-REVIEW.md` | "Review this — use code review skill" |
+| `skills/WEEKLY-PLANNING.md` | "Let's do weekly planning" |
+| `skills/DEEP-WORK.md` | "Research [topic] — use deep work skill" |
+
+**Add your own** in `AI Memory/skills/` — not in the repo if it contains personal methodology.
 
 ---
 
